@@ -41,13 +41,22 @@ class Stock:
         self.pe_ratio: float = 0.0  
 
     def _fetch_current_price(self) -> Optional[float]:
-        """
-        Placeholder: Replace this with logic to retrieve the current market price.
-        """
+        print (self.symbol)
+        try:
+            ticker = yf.Ticker(self.symbol)
+            todays_data = ticker.history(period='1d')
 
-        self.current_price = yf.info[self.symbol] 
-        # You would use a financial data API (e.g., Yahoo Finance) here
-        #return 100.0  # Temporary placeholder value 
+            # Check if the data is genuinely available
+            if not todays_data.empty: 
+                return todays_data['Close'][0]
+            else:
+                print(f"Warning: No data found for {self.symbol}.")
+                return 0.0 
+
+        except Exception as e:  # Be specific with exception types if possible
+            print(f"Error fetching price for {self.symbol}: {e}")
+            return 0.0 
+
 
     def __str__(self) -> str:
         """
