@@ -53,4 +53,20 @@ class Stock:
         """
         Returns a string representation of the Stock object.
         """
-        # ... (Same as before) 
+        lines = [
+            f"Company: {self.company_name} ({self.symbol})",
+            f"Shares: {self.qty}",
+            f"Cost per Share: ${self.cost_per_share:.2f}",
+            f"Cost Basis: ${self.cost_price:.2f}",
+        ]
+
+        if self.current_price is not None:
+            lines.extend([
+                f"Current Price: ${self.current_price:.2f}",
+                f"Market Value: ${self.market_value:.2f}",
+                f"Total Change: ${self.total_change:.2f}",
+                f"Gain/Loss: {self.gain_loss:.2f}%"
+            ])
+
+        return "\n".join(lines)
+
