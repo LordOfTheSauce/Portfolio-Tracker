@@ -29,7 +29,6 @@ def read_stocks_from_csv(csv_filename: str, start_row: int = 2) -> list[Stock]:
         for row in reader:
             try:
                 stocks.append(Stock(
-                    company_name=row['Company Name'],
                     symbol=row['Symbol'],
                     qty=float(row['Qty']),
                     cost_per_share=float(row['Cost/share']),
@@ -65,7 +64,6 @@ def read_stocks_from_excel(excel_filename: str, sheet_name: str = "Sheet1", star
             #print(row_num)
             #print(start_column)
             stocks.append(Stock(
-                company_name=sheet.cell(row=row_num, column=column_index_offset + 1).value,
                 symbol=sheet.cell(row=row_num, column=column_index_offset + 2).value,
                 qty=float(sheet.cell(row=row_num, column=column_index_offset + 3).value),
                 cost_per_share=float(sheet.cell(row=row_num, column=column_index_offset + 4).value)

@@ -13,6 +13,3 @@ for STONK in stonks:
     print(STONK)
 
 
-
-
-print("Ello")

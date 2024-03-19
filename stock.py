@@ -6,56 +6,63 @@ class Stock:
     A class to represent a stock holding (with type hints).
     """
 
-    def __init__(self, company_name: str, symbol: str, qty: float, cost_per_share: float):
+    def __init__(self, symbol: str, qty: float, cost_per_share: float):
         """
         Initializes a new Stock object with user-provided input.
 
         Args:
-            company_name (str): The name of the company.
             symbol (str): The stock symbol.
             qty (float): The number of shares held.
             cost_per_share (float): The cost per share of the stock.
         """
-
-        self.company_name = company_name
         self.symbol = symbol
+        self.ticker = yf.Ticker(symbol)
+        self.info = self.ticker.info
+        if 'symbol' not in self.info:
+            raise ValueError(f"No data found for ticker: {self.symbol}")
         self.qty = qty
         self.cost_per_share = cost_per_share
+        self.company_name = self.info['longName']
+        self.__calclate_values__()  # Calculate dependent values
 
-        self._calculate_values()  # Calculate dependent values
-
-    def _calculate_values(self) -> None:
+    def __calclate_values__(self) -> None:
         """
         Calculates dependent values based on the provided input.
         """
         self.cost_price: float = self.qty * self.cost_per_share
+        self.daily_data = self.ticker.history(period="1d")
+        self.weekly_data = self.ticker.history(period="1wk")
 
-        # You'll need to fetch the current market price 
-        self.current_price: Optional[float] = self._fetch_current_price()  
-        self.market_value: Optional[float] = self.qty * self.current_price if self.current_price else None 
-        self.total_change: Optional[float] = self.market_value - self.cost_price if self.market_value else None
-        self.gain_loss: Optional[float] = self.total_change 
+        if self.daily_data.empty:
+            print(f"Warning: No price data found for ticker: {self.symbol}, setting the price and weekly change to None.")  
+            self.current_price = None
+            self.weekly_change = None
+        else:
+            self.current_price = self.daily_data['Close'][0]
+            start_price = self.weekly_data['Close'].iloc[0]
+            self.weekly_change = ((self.current_price - start_price) / start_price) * 100  # Percentage change
+        
+        self.market_value = self.qty * self.current_price 
+        self.total_change = self.market_value - self.cost_price 
+        self.gain_loss = self.total_change/self.cost_price * 100 
 
-        # Cannot calculate these without external data:
-        self.weekly_change: float = 0.0 
-        self.pe_ratio: float = 0.0  
+        self.pe_ratio = self.info['trailingPE'] if 'trailingPE' in self.info else None
 
-    def _fetch_current_price(self) -> Optional[float]:
-        print (self.symbol)
-        try:
-            ticker = yf.Ticker(self.symbol)
-            todays_data = ticker.history(period='1d')
+    # def _fetch_current_price(self) -> Optional[float]:
+    #     print (self.symbol)
+    #     try:
+    #         todays_data = self.ticker.history(period='1d')
 
-            # Check if the data is genuinely available
-            if not todays_data.empty: 
-                return todays_data['Close'][0]
-            else:
-                print(f"Warning: No data found for {self.symbol}.")
-                return 0.0 
+    #         # Check if the data is genuinely available
+    #         if not todays_data.empty: 
+    #             return todays_data['Close'][0]
+    #         else:
+    #             print(f"Warning: No data found for {self.symbol}.")
+    #             return 0.0 
 
-        except Exception as e:  # Be specific with exception types if possible
-            print(f"Error fetching price for {self.symbol}: {e}")
-            return 0.0 
+    #     except Exception as e:  # Be specific with exception types if possible
+    #         print(f"Error fetching price for {self.symbol}: {e}")
+    #         return 0.0 
 
 
     def __str__(self) -> str:
