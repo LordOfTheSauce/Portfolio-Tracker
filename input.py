@@ -3,9 +3,10 @@
 #
 import openpyxl
 from stock import Stock
+from portfolio import Portfolio
 import csv
 
-def read_stocks_from_csv(csv_filename: str, start_row: int = 2) -> list[Stock]:
+def read_stocks_from_csv(csv_filename: str, start_row: int = 2) -> Portfolio:
     """
     Reads stock data from a CSV file with specific headers and creates a list of Stock objects.
 
@@ -36,10 +37,12 @@ def read_stocks_from_csv(csv_filename: str, start_row: int = 2) -> list[Stock]:
                 ))
             except ValueError:
                 print(f"Error parsing row: {row}")
+            except TypeError:
+                return Portfolio(stocks)
 
-    return stocks
+    return Portfolio(stocks)
 
-def read_stocks_from_excel(excel_filename: str, sheet_name: str = "Sheet1", start_row: int = 2, start_column: str = 'A') -> list[Stock]:
+def read_stocks_from_excel(excel_filename: str, sheet_name: str = "Sheet1", start_row: int = 2, start_column: str = 'A') -> Portfolio:
     """ 
     Reads stock data from an Excel file.
 
@@ -71,9 +74,9 @@ def read_stocks_from_excel(excel_filename: str, sheet_name: str = "Sheet1", star
         except ValueError:
             print(f"Error parsing row: {row_num}")
         except TypeError:
-            return stocks
+            return Portfolio(stocks)
 
-    return stocks
+    return Portfolio(stocks)
 
 
 def column_letter_to_index(column_letter: str) -> int:

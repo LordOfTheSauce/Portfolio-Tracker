@@ -7,10 +7,10 @@ Filename = "GCI Positions (Live).xlsx"
 sheet_name = "GCI Portfolio"
 
 
-stonks = read_stocks_from_excel(Filename,sheet_name,startrow,startcoulumn, )
+portfolio = read_stocks_from_excel(Filename,sheet_name,startrow,startcoulumn, )
+portfolio.print_stocks()
+portfolio.summary()
 
-for STONK in stonks:
-    print(STONK)
-    print("")
+
 
 

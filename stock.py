@@ -38,8 +38,8 @@ class Stock:
             self.weekly_change = None
         else:
             self.current_price = self.weekly_data['Close'].iloc[-1]
-            start_price = self.weekly_data['Close'].iloc[0]
-            self.weekly_change = ((self.current_price - start_price) / start_price) * 100  # Percentage change
+            self.past_price = self.weekly_data['Close'].iloc[0]
+            self.weekly_change = ((self.current_price - self.past_price) / self.past_price) * 100  # Percentage change
         
         self.market_value = self.qty * self.current_price 
         self.total_change = self.market_value - self.cost_price 
