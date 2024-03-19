@@ -30,15 +30,14 @@ class Stock:
         Calculates dependent values based on the provided input.
         """
         self.cost_price: float = self.qty * self.cost_per_share
-        self.daily_data = self.ticker.history(period="1d")
         self.weekly_data = self.ticker.history(period="1wk")
 
-        if self.daily_data.empty:
+        if self.weekly_data.empty:
             print(f"Warning: No price data found for ticker: {self.symbol}, setting the price and weekly change to None.")  
             self.current_price = None
             self.weekly_change = None
         else:
-            self.current_price = self.daily_data['Close'][0]
+            self.current_price = self.weekly_data['Close'].iloc[-1]
             start_price = self.weekly_data['Close'].iloc[0]
             self.weekly_change = ((self.current_price - start_price) / start_price) * 100  # Percentage change
         
