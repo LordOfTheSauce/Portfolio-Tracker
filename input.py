@@ -60,16 +60,16 @@ def read_stocks_from_excel(excel_filename: str, sheet_name: str = "Sheet1", star
     workbook = openpyxl.load_workbook(excel_filename)
     sheet = workbook[sheet_name]
 
-    column_index_offset = column_letter_to_index(start_column)
+    column_index = column_letter_to_index(start_column)
     
     for row_num in range(start_row, sheet.max_row + 1):  # Iterate through rows
         try:
             #print(row_num)
             #print(start_column)
             stocks.append(Stock(
-                symbol=sheet.cell(row=row_num, column=column_index_offset + 2).value,
-                qty=float(sheet.cell(row=row_num, column=column_index_offset + 3).value),
-                cost_per_share=float(sheet.cell(row=row_num, column=column_index_offset + 4).value)
+                symbol=sheet.cell(row=row_num, column=column_index + 1).value,
+                qty=float(sheet.cell(row=row_num, column=column_index + 2).value),
+                cost_per_share=float(sheet.cell(row=row_num, column=column_index + 3).value)
             ))
         except ValueError:
             print(f"Error parsing row: {row_num}")

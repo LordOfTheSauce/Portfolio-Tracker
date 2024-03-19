@@ -11,7 +11,7 @@ class Portfolio:
             stocks (list): A list of Stock objects.
         """
         self.stocks = stocks
-        self.tickers = [stock.ticker for stock in stocks]
+        self.symbols = [stock.symbol for stock in stocks]
         self.__calculate_values__()
 
     def __calculate_values__(self) -> None:
@@ -33,7 +33,7 @@ class Portfolio:
             stock (Stock): A Stock object to be added to the portfolio.
         """
         self.stocks.append(stock)
-        self.tickers.append(stock.ticker)
+        self.symbols.append(stock.symbol)
         self.__calculate_values__()
 
     def remove_stock(self, stock: Stock) -> None:
@@ -43,7 +43,7 @@ class Portfolio:
             stock (Stock): A Stock object to be removed from the portfolio.
         """
         self.stocks.remove(stock)
-        self.tickers.remove(stock.ticker)
+        self.symbols.remove(stock.symbol)
         self.__calculate_values__()
 
     def print_stocks(self) -> None:
@@ -70,4 +70,4 @@ class Portfolio:
                 f"Total Change: ${self.total_change:.2f}", 
                 f"Gain/Loss: {self.gain_loss:.2f}%", 
                 f"Weekly Change: {self.weekly_change:.2f}%", 
-                f"PE Ratio: {self.pe_ratio:.2f}"])
+                f"Mean PE Ratio: {self.pe_ratio:.2f}"])

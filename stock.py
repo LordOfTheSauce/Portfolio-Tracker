@@ -31,38 +31,26 @@ class Stock:
         """
         self.cost_price: float = self.qty * self.cost_per_share
         self.weekly_data = self.ticker.history(period="1wk")
+        self.daily_data = self.ticker.history(period="1d")
 
-        if self.weekly_data.empty:
-            print(f"Warning: No price data found for ticker: {self.symbol}, setting the price and weekly change to None.")  
-            self.current_price = None
-            self.weekly_change = None
-        else:
-            self.current_price = self.weekly_data['Close'].iloc[-1]
+        try:
+            self.current_price = self.daily_data['Close'].iloc[0]
             self.past_price = self.weekly_data['Close'].iloc[0]
             self.weekly_change = ((self.current_price - self.past_price) / self.past_price) * 100  # Percentage change
-        
-        self.market_value = self.qty * self.current_price 
-        self.total_change = self.market_value - self.cost_price 
-        self.gain_loss = self.total_change/self.cost_price * 100 
+            self.market_value = self.qty * self.current_price 
+            self.total_change = self.market_value - self.cost_price 
+            self.gain_loss = self.total_change/self.cost_price * 100 
+            self.pe_ratio = self.info['trailingPE'] if 'trailingPE' in self.info else 0
 
-        self.pe_ratio = self.info['trailingPE'] if 'trailingPE' in self.info else None
-
-    # def _fetch_current_price(self) -> Optional[float]:
-    #     print (self.symbol)
-    #     try:
-    #         todays_data = self.ticker.history(period='1d')
-
-    #         # Check if the data is genuinely available
-    #         if not todays_data.empty: 
-    #             return todays_data['Close'][0]
-    #         else:
-    #             print(f"Warning: No data found for {self.symbol}.")
-    #             return 0.0 
-
-    #     except Exception as e:  # Be specific with exception types if possible
-    #         print(f"Error fetching price for {self.symbol}: {e}")
-    #         return 0.0 
-
+        except IndexError:
+            self.current_price = 0
+            self.past_price = 0
+            self.weekly_change = 0
+            self.market_value = 0
+            self.total_change = 0
+            self.gain_loss = 0
+            self.pe_ratio = None
+            print(f"Warning: No current price found for {self.symbol}, setting all values to 0.")
 
     def __str__(self) -> str:
         """
@@ -75,7 +63,7 @@ class Stock:
             f"Cost Basis: ${self.cost_price:.2f}",
         ]
 
-        if self.current_price is not None:
+        if self.current_price != 0:
             lines.extend([
                 f"Current Price: ${self.current_price:.2f}",
                 f"Market Value: ${self.market_value:.2f}",
@@ -84,6 +72,8 @@ class Stock:
                 f"Weekly Change: {self.weekly_change:.2f}%",
                 f"PE Ratio: {self.pe_ratio}"
             ])
+        else:
+            lines.append("Warning: No current price found for this stock.")
 
         return "\n".join(lines)
 
