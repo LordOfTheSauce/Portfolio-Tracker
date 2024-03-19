@@ -11,5 +11,6 @@ stonks = read_stocks_from_excel(Filename,sheet_name,startrow,startcoulumn, )
 
 for STONK in stonks:
     print(STONK)
+    print("")
 
 

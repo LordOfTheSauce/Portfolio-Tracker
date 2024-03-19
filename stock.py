@@ -81,7 +81,9 @@ class Stock:
                 f"Current Price: ${self.current_price:.2f}",
                 f"Market Value: ${self.market_value:.2f}",
                 f"Total Change: ${self.total_change:.2f}",
-                f"Gain/Loss: {self.gain_loss:.2f}%"
+                f"Gain/Loss: {self.gain_loss:.2f}%",
+                f"Weekly Change: {self.weekly_change:.2f}%",
+                f"PE Ratio: {self.pe_ratio}"
             ])
 
         return "\n".join(lines)
