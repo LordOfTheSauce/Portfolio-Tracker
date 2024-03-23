@@ -14,7 +14,14 @@ class Portfolio:
         self.stocks = {}
         for stock in stocks:
             self.stocks.update({stock.symbol: stock})
+        self.update_data()
         
+        
+
+    def update_data(self) -> None:
+        """
+        Fetches data from Yahoo Finance for all stocks in the portfolio.
+        """
         if(len(self.stocks) == 0):
             print("No stocks in the portfolio. Exiting.")
             exit()
@@ -60,18 +67,17 @@ class Portfolio:
         errorMsg = yf.shared._ERRORS
         errorSymbols = list(errorMsg.keys())
         for errorSymbol in errorSymbols:
-            print(errorSymbol + " does not have current price available. Removing from portfolio.")
+            print(errorSymbol + " does not have current price available. Removed from portfolio.")
             self.remove_stock(errorSymbol)
 
-    # # def add_stock(self, stock: Stock) -> None:
-    #     """
-    #     Adds a new stock to the portfolio.
-    #     Args:
-    #         stock (Stock): A Stock object to be added to the portfolio.
-    #     """
-    #     self.stocks.append(stock)
-    #     self.symbols.append(stock.symbol)
-    #     self.__calculate_values__()
+    def add_stock(self, stock: Stock) -> None:
+        """
+        Adds a new stock to the portfolio.
+        Args:
+            stock (Stock): A Stock object to be added to the portfolio.
+        """
+        self.stocks.update({stock.symbol: stock})
+        self.update_data()
 
     def remove_stock(self, stock: Stock) -> None:
         """
