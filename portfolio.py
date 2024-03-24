@@ -13,11 +13,13 @@ class Portfolio:
         """
         self.stocks = {}
         for stock in stocks:
-            self.stocks.update({stock.symbol: stock})
+            if stock.symbol in self.stocks:
+                self.stocks[stock.symbol].add_to_stock(stock.qtys, stock.costs_per_share)
+            else:
+                self.stocks.update({stock.symbol: stock})
         self.update_data()
         
         
-
     def update_data(self) -> None:
         """
         Fetches data from Yahoo Finance for all stocks in the portfolio.
@@ -48,7 +50,7 @@ class Portfolio:
         if len(self.stocks) == 0:
             print("No stocks in the portfolio.")
             self.market_value = 0
-            self.cost_price = 0
+            self.base_cost = 0
             self.total_change = 0
             self.gain_loss = 0
             past_market_value = 0
@@ -56,9 +58,9 @@ class Portfolio:
             self.pe_ratio = 0
         else:
             self.market_value = sum([stock.market_value for stock in self.stocks.values()])
-            self.cost_price = sum([stock.cost_price for stock in self.stocks.values()])
+            self.base_cost = sum([stock.base_cost for stock in self.stocks.values()])
             self.total_change = sum([stock.total_change for stock in self.stocks.values()])
-            self.gain_loss = self.total_change / self.cost_price * 100
+            self.gain_loss = self.total_change / self.base_cost * 100
             past_market_value = sum([stock.qty * stock.past_price for stock in self.stocks.values()])
             self.weekly_change = ((self.market_value - past_market_value) / past_market_value) * 100
             self.pe_ratio = sum([stock.pe_ratio for stock in self.stocks.values() if stock.pe_ratio is not None]) / len([stock.pe_ratio for stock in self.stocks.values() if stock.pe_ratio is not None])
@@ -76,19 +78,12 @@ class Portfolio:
         Args:
             stock (Stock): A Stock object to be added to the portfolio.
         """
-        self.stocks.update({stock.symbol: stock})
-        self.update_data()
-
-    def remove_stock(self, stock: Stock) -> None:
-        """
-        Removes a stock from the portfolio.
-        Args:
-            stock (Stock): A Stock object to be removed from the portfolio.
-        """
-        del self.stocks[stock.symbol]
-        self.data1d = self.data1d.drop(stock.symbol, axis=1, level='Ticker')
-        self.data5y = self.data5y.drop(stock.symbol, axis=1, level='Ticker')
-        self.calculate_values()
+        if stock.symbol in self.stocks:
+            self.stocks[stock.symbol].add_to_stock(stock.qtys, stock.costs_per_share)
+            self.calculate_values()
+        else:
+            self.stocks.update({stock.symbol: stock})
+            self.update_data() 
         
     def remove_stock(self, symbol: str) -> None:
         """
@@ -121,7 +116,7 @@ class Portfolio:
         """
         return "\n".join([f"Portfolio Summary:",
                 f"Market Value: ${self.market_value:.2f}", 
-                f"Cost Basis: ${self.cost_price:.2f}", 
+                f"Cost Basis: ${self.base_cost:.2f}", 
                 f"Total Change: ${self.total_change:.2f}", 
                 f"Gain/Loss: {self.gain_loss:.2f}%", 
                 f"Weekly Change: {self.weekly_change:.2f}%", 
